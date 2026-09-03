@@ -45,7 +45,17 @@ make build
 
 这条路径需要先安装 [XcodeGen](https://github.com/yonaskolb/XcodeGen)：`brew install xcodegen`。
 
-编译成功后，应用名称是 **IPA Tool**。
+编译成功后，应用名称是 **IPA Tool**。需要的话可以拷到 `/Applications`。
+
+### 3. 去掉隔离属性
+
+应用没有经过 Apple 公证，第一次打开可能被系统拦截。在终端执行：
+
+```bash
+xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
+```
+
+然后再从「应用程序」里打开 **IPA Tool**。
 
 ## 使用方法
 

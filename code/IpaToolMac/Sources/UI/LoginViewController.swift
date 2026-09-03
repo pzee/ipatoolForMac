@@ -72,6 +72,11 @@ final class LoginViewController: NSViewController, NSTextFieldDelegate {
         buttonRow.orientation = .horizontal
         buttonRow.alignment = .centerY
         buttonRow.spacing = 8
+        buttonRow.distribution = .fill
+        signInButton.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        spinner.setContentHuggingPriority(.required, for: .horizontal)
+        spinner.setContentCompressionResistancePriority(.required, for: .horizontal)
+        spinner.isHidden = true
 
         let form = NSStackView(views: [
             icon, title, subtitle,
@@ -99,7 +104,7 @@ final class LoginViewController: NSViewController, NSTextFieldDelegate {
             make.size.equalTo(56)
             make.centerX.equalTo(form)
         }
-        [title, subtitle, emailField, passwordField, authField, errorLabel, hintLabel, buttonRow, signInButton].forEach { item in
+        [title, subtitle, emailField, passwordField, authField, errorLabel, hintLabel, buttonRow].forEach { item in
             item.snp.makeConstraints { make in
                 make.width.equalTo(form)
             }
@@ -199,6 +204,7 @@ final class LoginViewController: NSViewController, NSTextFieldDelegate {
         emailField.isEnabled = !busy
         passwordField.isEnabled = !busy
         authField.isEnabled = !busy
+        spinner.isHidden = !busy
         if busy {
             spinner.startAnimation(nil)
         } else {

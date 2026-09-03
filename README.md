@@ -45,7 +45,17 @@ make build
 
 That needs [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`brew install xcodegen`).
 
-After a successful build, the app is named **IPA Tool**.
+After a successful build, the app is named **IPA Tool**. Copy it to `/Applications` if you want.
+
+### 3. Remove Gatekeeper quarantine
+
+The app is not notarized. macOS may block it the first time you open it. Run:
+
+```bash
+xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
+```
+
+Then open **IPA Tool** from Applications.
 
 ## Usage
 
