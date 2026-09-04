@@ -1,4 +1,5 @@
 import AppKit
+import Darwin
 import Foundation
 
 extension Notification.Name {
@@ -27,10 +28,15 @@ final class Session {
     private var downloadRunning = false
     private let folderKey = "downloadFolderPath"
     private let store = DownloadStore.shared
+    private var folderWatcher: DispatchSourceFileSystemObject?
+    private var folderDescriptor: Int32 = -1
+    private var pruneWork: DispatchWorkItem?
 
     private init() {
         downloads = store.loadAll()
+        KeychainAccess.allowIpatoolWithoutPrompt()
         ArtworkStore.shared.countryCode = StoreFront.countryCode(from: StoreFront.accountStoreFront())
+        startWatchingDownloadFolder()
     }
 
     var downloadFolder: URL {
@@ -43,6 +49,7 @@ final class Session {
         }
         set {
             UserDefaults.standard.set(newValue.path, forKey: folderKey)
+            startWatchingDownloadFolder()
             NotificationCenter.default.post(name: .sessionFolderDidChange, object: self)
         }
     }
@@ -62,6 +69,7 @@ final class Session {
 
     func login(email: String, password: String, authCode: String?) async throws {
         setStatus(L10n.signingIn, error: false, busy: true)
+        KeychainAccess.noteCredentialsChanged()
         do {
             account = try await service.login(email: email, password: password, authCode: authCode)
             ArtworkStore.shared.countryCode = account?.countryCode
@@ -74,7 +82,7 @@ final class Session {
     }
 
     func signOut() async {
-        setStatus("正在退出…", error: false, busy: true)
+        setStatus(L10n.signingOut, error: false, busy: true)
         do {
             try await service.revoke()
             account = nil
@@ -111,12 +119,46 @@ final class Session {
         downloads.insert(job, at: 0)
         store.upsert(job)
         NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
-        setStatus("已加入下载队列：\(job.appName)", error: false, busy: isBusy)
+        setStatus(String(format: L10n.queuedFormat, job.appName), error: false, busy: isBusy)
         pumpDownloads()
     }
 
     func reveal(_ url: URL) {
         NSWorkspace.shared.activateFileViewerSelecting([url])
+    }
+
+    func deleteDownloads(_ ids: [UUID]) {
+        var removedNames: [String] = []
+        for id in ids {
+            guard let index = downloads.firstIndex(where: { $0.id == id }) else { continue }
+            let job = downloads[index]
+            guard job.canDelete else { continue }
+            if let url = job.outputPath, FileManager.default.fileExists(atPath: url.path) {
+                try? FileManager.default.trashItem(at: url, resultingItemURL: nil)
+            }
+            removedNames.append(job.appName)
+            downloads.remove(at: index)
+            store.delete(id)
+        }
+        guard !removedNames.isEmpty else { return }
+        NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
+        if removedNames.count == 1 {
+            setStatus(String(format: L10n.deletedOne, removedNames[0]), error: false, busy: isBusy)
+        } else {
+            setStatus(String(format: L10n.deletedMany, removedNames.count), error: false, busy: isBusy)
+        }
+    }
+
+    func pruneMissingDownloads() {
+        let staleIDs = downloads.compactMap { job -> UUID? in
+            job.status == .succeeded && !job.fileExists ? job.id : nil
+        }
+        guard !staleIDs.isEmpty else { return }
+        for id in staleIDs {
+            downloads.removeAll { $0.id == id }
+            store.delete(id)
+        }
+        NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
     }
 
     func chooseDownloadFolder(from window: NSWindow?) {
@@ -126,13 +168,13 @@ final class Session {
         panel.allowsMultipleSelection = false
         panel.canCreateDirectories = true
         panel.directoryURL = downloadFolder
-        panel.prompt = "选择"
-        panel.message = "之后下载的 IPA 会保存到这个文件夹"
+        panel.prompt = L10n.choose
+        panel.message = L10n.chooseFolderMessage
         let handler: (NSApplication.ModalResponse) -> Void = { [weak self] response in
             guard let self, response == .OK, let url = panel.url else { return }
             try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
             self.downloadFolder = url
-            self.setStatus("下载目录：\(Formatters.homeRelative(url))", error: false, busy: false)
+            self.setStatus(String(format: L10n.folderSet, Formatters.homeRelative(url)), error: false, busy: false)
         }
         if let window {
             panel.beginSheetModal(for: window, completionHandler: handler)
@@ -198,10 +240,49 @@ final class Session {
         if let error {
             setStatus(error, error: true, busy: false)
         } else if let path {
-            setStatus("已保存到 \(Formatters.homeRelative(path))", error: false, busy: false)
+            setStatus(String(format: L10n.savedTo, Formatters.homeRelative(path)), error: false, busy: false)
         } else {
             setStatus(L10n.ready, error: false, busy: false)
         }
         pumpDownloads()
+    }
+
+    private func startWatchingDownloadFolder() {
+        stopWatchingDownloadFolder()
+        let folder = downloadFolder
+        try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let fd = open(folder.path, O_EVTONLY)
+        guard fd >= 0 else { return }
+        folderDescriptor = fd
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: fd,
+            eventMask: [.write, .delete, .rename],
+            queue: .main
+        )
+        source.setEventHandler { [weak self] in
+            self?.schedulePrune()
+        }
+        source.setCancelHandler {
+            close(fd)
+        }
+        source.resume()
+        folderWatcher = source
+    }
+
+    private func stopWatchingDownloadFolder() {
+        folderWatcher?.cancel()
+        folderWatcher = nil
+        folderDescriptor = -1
+        pruneWork?.cancel()
+        pruneWork = nil
+    }
+
+    private func schedulePrune() {
+        pruneWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            self?.pruneMissingDownloads()
+        }
+        pruneWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35, execute: work)
     }
 }

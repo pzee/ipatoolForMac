@@ -1,75 +1,122 @@
 import Foundation
 
 enum L10n {
-    static let appName = "IPA Tool"
-    static let search = "搜索"
-    static let purchases = "已购"
-    static let downloads = "下载"
-    static let account = "账户"
-    static let signIn = "登录"
-    static let signOut = "退出登录"
-    static let appleID = "Apple ID"
-    static let password = "密码"
-    static let authCode = "验证码"
-    static let authCodeHint = "请输入双重认证验证码"
-    static let loginTitle = "登录 App Store"
-    static let loginSubtitle = "使用能访问 App Store 的 Apple ID。\n下载的 IPA 仍是 FairPlay 加密包。"
-    static let firstLoginHint = "首次登录可能需要几分钟，请耐心等待。"
-    static let notSignedIn = "未登录"
-    static let searchPlaceholder = "搜索 App Store"
-    static let filterPlaceholder = "过滤列表"
-    static let selectApp = "选择一个应用查看详情"
-    static let download = "下载"
-    static let get = "获取"
-    static let downloadLatest = "下载最新版"
-    static let obtainLicense = "获取授权"
-    static let versions = "历史版本"
-    static let showInFinder = "在 Finder 中显示"
-    static let copyBundleID = "拷贝 Bundle ID"
-    static let copyAppID = "拷贝 App ID"
-    static let bundleID = "Bundle ID"
-    static let version = "版本"
-    static let price = "价格"
-    static let appID = "App ID"
-    static let platform = "平台"
-    static let purchaseDate = "购买日期"
-    static let free = "免费"
-    static let downloadFolder = "下载目录"
-    static let changeFolder = "更改…"
-    static let chooseDownloadFolder = "选择下载目录…"
-    static let revealFolder = "显示文件夹"
-    static let previous = "上一页"
-    static let next = "下一页"
-    static let refresh = "刷新"
-    static let ready = "就绪"
-    static let searching = "正在搜索…"
-    static let loadingPurchases = "正在加载已购应用…"
-    static let downloading = "正在下载…"
-    static let signingIn = "正在登录…"
-    static let signedIn = "已登录"
-    static let signedOut = "已退出"
-    static let licenseObtained = "已获取授权"
-    static let alreadyOwned = "该应用已拥有授权"
-    static let emptySearch = "搜索 App Store 上的应用"
-    static let emptySearchHint = "在工具栏输入关键词后按回车。"
-    static let emptyPurchases = "没有已购应用"
-    static let emptyPurchasesHint = "登录后即可查看这个 Apple ID 拥有的应用。"
-    static let emptyDownloads = "还没有下载任务"
-    static let emptyDownloadsHint = "从搜索或已购列表下载后，进度会出现在这里。"
-    static let emptyVersions = "没有可用的历史版本"
-    static let close = "关闭"
-    static let versionID = "版本 ID"
-    static let releaseDate = "发布日期"
-    static let loadingVersions = "正在加载版本列表…"
-    static let loadingMetadata = "正在加载版本信息…"
-    static let encryptedHint = "下载的 IPA 仍是 FairPlay 加密包，需要用已购账号的设备安装。"
-    static let purchaseIfNeededHint = "免费应用会在需要时自动获取授权。"
-    static let binaryMissing = "找不到 ipatool。请安装 Go 后重新编译，或用 Homebrew 安装 ipatool。"
-    static let unknownError = "发生未知错误"
-    static let queued = "排队中"
-    static let succeeded = "已完成"
-    static let failed = "失败"
-    static let running = "进行中"
-    static let pageFormat = "第 %d 页 · 本页 %d · 共 %d"
-    static let resultsFormat = "%d 个结果"
+    static var appName: String { kL_appName.localized() }
+    static var search: String { kL_search.localized() }
+    static var purchases: String { kL_purchases.localized() }
+    static var downloads: String { kL_downloads.localized() }
+    static var account: String { kL_account.localized() }
+    static var signIn: String { kL_signIn.localized() }
+    static var signOut: String { kL_signOut.localized() }
+    static var appleID: String { kL_appleID.localized() }
+    static var password: String { kL_password.localized() }
+    static var authCode: String { kL_authCode.localized() }
+    static var authCodeHint: String { kL_authCodeHint.localized() }
+    static var loginTitle: String { kL_loginTitle.localized() }
+    static var loginSubtitle: String { kL_loginSubtitle.localized() }
+    static var firstLoginHint: String { kL_firstLoginHint.localized() }
+    static var notSignedIn: String { kL_notSignedIn.localized() }
+    static var searchPlaceholder: String { kL_searchPlaceholder.localized() }
+    static var filterPlaceholder: String { kL_filterPlaceholder.localized() }
+    static var selectApp: String { kL_selectApp.localized() }
+    static var download: String { kL_download.localized() }
+    static var get: String { kL_get.localized() }
+    static var downloadLatest: String { kL_downloadLatest.localized() }
+    static var obtainLicense: String { kL_obtainLicense.localized() }
+    static var versions: String { kL_versions.localized() }
+    static var showInFinder: String { kL_showInFinder.localized() }
+    static var deleteIPA: String { kL_deleteIPA.localized() }
+    static var removeFromList: String { kL_removeFromList.localized() }
+    static var deleteIPATitle: String { kL_deleteIPATitle.localized() }
+    static var deleteIPAMessage: String { kL_deleteIPAMessage.localized() }
+    static var removeFromListTitle: String { kL_removeFromListTitle.localized() }
+    static var removeFromListMessage: String { kL_removeFromListMessage.localized() }
+    static var copyBundleID: String { kL_copyBundleID.localized() }
+    static var copyAppID: String { kL_copyAppID.localized() }
+    static var bundleID: String { kL_bundleID.localized() }
+    static var version: String { kL_version.localized() }
+    static var price: String { kL_price.localized() }
+    static var appID: String { kL_appID.localized() }
+    static var platform: String { kL_platform.localized() }
+    static var purchaseDate: String { kL_purchaseDate.localized() }
+    static var free: String { kL_free.localized() }
+    static var downloadFolder: String { kL_downloadFolder.localized() }
+    static var changeFolder: String { kL_changeFolder.localized() }
+    static var chooseDownloadFolder: String { kL_chooseDownloadFolder.localized() }
+    static var revealFolder: String { kL_revealFolder.localized() }
+    static var previous: String { kL_previous.localized() }
+    static var next: String { kL_next.localized() }
+    static var refresh: String { kL_refresh.localized() }
+    static var ready: String { kL_ready.localized() }
+    static var searching: String { kL_searching.localized() }
+    static var loadingPurchases: String { kL_loadingPurchases.localized() }
+    static var downloading: String { kL_downloading.localized() }
+    static var signingIn: String { kL_signingIn.localized() }
+    static var signedIn: String { kL_signedIn.localized() }
+    static var signedOut: String { kL_signedOut.localized() }
+    static var licenseObtained: String { kL_licenseObtained.localized() }
+    static var alreadyOwned: String { kL_alreadyOwned.localized() }
+    static var emptySearch: String { kL_emptySearch.localized() }
+    static var emptySearchHint: String { kL_emptySearchHint.localized() }
+    static var emptyPurchases: String { kL_emptyPurchases.localized() }
+    static var emptyPurchasesHint: String { kL_emptyPurchasesHint.localized() }
+    static var emptyDownloads: String { kL_emptyDownloads.localized() }
+    static var emptyDownloadsHint: String { kL_emptyDownloadsHint.localized() }
+    static var emptyVersions: String { kL_emptyVersions.localized() }
+    static var close: String { kL_close.localized() }
+    static var versionID: String { kL_versionID.localized() }
+    static var releaseDate: String { kL_releaseDate.localized() }
+    static var loadingVersions: String { kL_loadingVersions.localized() }
+    static var loadingMetadata: String { kL_loadingMetadata.localized() }
+    static var encryptedHint: String { kL_encryptedHint.localized() }
+    static var purchaseIfNeededHint: String { kL_purchaseIfNeededHint.localized() }
+    static var binaryMissing: String { kL_binaryMissing.localized() }
+    static var unknownError: String { kL_unknownError.localized() }
+    static var queued: String { kL_queued.localized() }
+    static var succeeded: String { kL_succeeded.localized() }
+    static var failed: String { kL_failed.localized() }
+    static var running: String { kL_running.localized() }
+    static var pageFormat: String { kL_pageFormat.localized() }
+    static var resultsFormat: String { kL_resultsFormat.localized() }
+    static var language: String { kL_language.localized() }
+    static var languageSystem: String { kL_languageSystem.localized() }
+    static var languageChinese: String { kL_languageChinese.localized() }
+    static var languageEnglish: String { kL_languageEnglish.localized() }
+    static var cancel: String { kL_cancel.localized() }
+    static var aboutApp: String { kL_aboutApp.localized() }
+    static var quitApp: String { kL_quitApp.localized() }
+    static var edit: String { kL_edit.localized() }
+    static var undo: String { kL_undo.localized() }
+    static var redo: String { kL_redo.localized() }
+    static var cut: String { kL_cut.localized() }
+    static var copy: String { kL_copy.localized() }
+    static var paste: String { kL_paste.localized() }
+    static var delete: String { kL_delete.localized() }
+    static var selectAll: String { kL_selectAll.localized() }
+    static var view: String { kL_view.localized() }
+    static var window: String { kL_window.localized() }
+    static var minimize: String { kL_minimize.localized() }
+    static var zoom: String { kL_zoom.localized() }
+    static var pleaseSignIn: String { kL_pleaseSignIn.localized() }
+    static var signingOut: String { kL_signingOut.localized() }
+    static var queuedFormat: String { kL_queuedFormat.localized() }
+    static var deletedOne: String { kL_deletedOne.localized() }
+    static var deletedMany: String { kL_deletedMany.localized() }
+    static var choose: String { kL_choose.localized() }
+    static var chooseFolderMessage: String { kL_chooseFolderMessage.localized() }
+    static var folderSet: String { kL_folderSet.localized() }
+    static var savedTo: String { kL_savedTo.localized() }
+    static var enterAppleID: String { kL_enterAppleID.localized() }
+    static var enterPassword: String { kL_enterPassword.localized() }
+    static var signInToShowAccount: String { kL_signInToShowAccount.localized() }
+    static var deleteIPAConfirmOne: String { kL_deleteIPAConfirmOne.localized() }
+    static var deleteIPAConfirmMany: String { kL_deleteIPAConfirmMany.localized() }
+    static var purchasedSuffix: String { kL_purchasedSuffix.localized() }
+    static var downloadInterrupted: String { kL_downloadInterrupted.localized() }
+    static var noAccount: String { kL_noAccount.localized() }
+    static var downloadNoPath: String { kL_downloadNoPath.localized() }
+    static var ipatoolNoJSON: String { kL_ipatoolNoJSON.localized() }
+    static var ipatoolExitCode: String { kL_ipatoolExitCode.localized() }
+    static var versionsTitle: String { kL_versionsTitle.localized() }
+    static var versionCount: String { kL_versionCount.localized() }
 }

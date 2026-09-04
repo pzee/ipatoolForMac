@@ -76,7 +76,7 @@ struct StoreApp: Equatable {
         var parts: [String] = []
         if !version.isEmpty { parts.append(version) }
         if let purchaseDate {
-            parts.append(Formatters.day.string(from: purchaseDate) + " 购买")
+            parts.append(String(format: L10n.purchasedSuffix, Formatters.day.string(from: purchaseDate)))
         } else {
             parts.append(Formatters.price(price))
         }
@@ -134,6 +134,15 @@ struct DownloadJob: Equatable {
     var outputPath: URL?
     var errorMessage: String?
     var createdAt: Date
+
+    var fileExists: Bool {
+        guard let outputPath else { return false }
+        return FileManager.default.fileExists(atPath: outputPath.path)
+    }
+
+    var canDelete: Bool {
+        status != .running
+    }
 }
 
 enum IPAToolError: LocalizedError {

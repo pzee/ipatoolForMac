@@ -1,14 +1,15 @@
 import AppKit
 import SnapKit
 
-final class DownloadsViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate {
+final class DownloadsViewController: NSViewController, NSTableViewDataSource, NSTableViewDelegate, NSMenuItemValidation, NSMenuDelegate {
     private var jobs: [DownloadJob] = []
     private var filtered: [DownloadJob] = []
     private var filterText = ""
-    private let table = NSTableView()
+    private let table = DownloadTableView()
     private let scroll = NSScrollView()
     private let empty = EmptyStateView()
     private let pathLabel = NSTextField(labelWithString: "")
+    private let deleteButton = NSButton(title: L10n.deleteIPA, target: nil, action: nil)
 
     override func loadView() {
         view = NSView()
@@ -23,14 +24,20 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
 
         let changeButton = NSButton(title: L10n.changeFolder, target: self, action: #selector(changeFolder))
         let revealButton = NSButton(title: L10n.revealFolder, target: self, action: #selector(revealFolder))
+        deleteButton.target = self
+        deleteButton.action = #selector(deleteSelected)
         changeButton.bezelStyle = .roundRect
         revealButton.bezelStyle = .roundRect
+        deleteButton.bezelStyle = .roundRect
         changeButton.controlSize = .small
         revealButton.controlSize = .small
+        deleteButton.controlSize = .small
+        deleteButton.isEnabled = false
 
         let header = NSView()
         header.addSubview(caption)
         header.addSubview(pathLabel)
+        header.addSubview(deleteButton)
         header.addSubview(revealButton)
         header.addSubview(changeButton)
         caption.snp.makeConstraints { make in
@@ -40,7 +47,7 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         pathLabel.snp.makeConstraints { make in
             make.leading.equalTo(caption.snp.trailing).offset(8)
             make.centerY.equalToSuperview()
-            make.trailing.lessThanOrEqualTo(revealButton.snp.leading).offset(-12)
+            make.trailing.lessThanOrEqualTo(deleteButton.snp.leading).offset(-12)
         }
         changeButton.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-14)
@@ -50,18 +57,25 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
             make.trailing.equalTo(changeButton.snp.leading).offset(-8)
             make.centerY.equalToSuperview()
         }
+        deleteButton.snp.makeConstraints { make in
+            make.trailing.equalTo(revealButton.snp.leading).offset(-8)
+            make.centerY.equalToSuperview()
+        }
 
         table.headerView = nil
         table.rowHeight = 64
         table.backgroundColor = .windowBackgroundColor
         table.style = .fullWidth
         table.selectionHighlightStyle = .regular
+        table.allowsMultipleSelection = true
         table.delegate = self
         table.dataSource = self
         table.intercellSpacing = .zero
         table.gridStyleMask = []
         table.doubleAction = #selector(revealSelected)
         table.target = self
+        table.onDeleteKey = { [weak self] in self?.deleteSelected() }
+        table.menu = makeMenu()
         table.addTableColumn(NSTableColumn(identifier: NSUserInterfaceItemIdentifier("job")))
 
         scroll.documentView = table
@@ -108,6 +122,11 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         reloadFromSession()
     }
 
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        Session.shared.pruneMissingDownloads()
+    }
+
     @objc private func changeFolder() {
         Session.shared.chooseDownloadFolder(from: view.window)
     }
@@ -143,6 +162,11 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         table.reloadData()
         scroll.isHidden = filtered.isEmpty
         empty.isHidden = !filtered.isEmpty
+        updateDeleteButton()
+    }
+
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        updateDeleteButton()
     }
 
     func numberOfRows(in tableView: NSTableView) -> Int { filtered.count }
@@ -160,9 +184,110 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
     }
 
     @objc private func revealSelected() {
-        let row = table.selectedRow
-        guard row >= 0, row < filtered.count, let url = filtered[row].outputPath else { return }
+        guard let job = actionJobs().first, let url = job.outputPath, job.fileExists else { return }
         Session.shared.reveal(url)
+    }
+
+    @objc func delete(_ sender: Any?) {
+        deleteSelected()
+    }
+
+    @objc private func deleteSelected() {
+        let jobs = actionJobs().filter(\.canDelete)
+        guard !jobs.isEmpty else { return }
+        let hasFiles = jobs.contains(where: \.fileExists)
+        let alert = NSAlert()
+        if hasFiles {
+            alert.messageText = L10n.deleteIPATitle
+            if jobs.count == 1 {
+                alert.informativeText = String(format: L10n.deleteIPAConfirmOne, jobs[0].appName)
+            } else {
+                alert.informativeText = String(format: L10n.deleteIPAConfirmMany, jobs.count)
+            }
+        } else {
+            alert.messageText = L10n.removeFromListTitle
+            alert.informativeText = L10n.removeFromListMessage
+        }
+        alert.alertStyle = .warning
+        alert.addButton(withTitle: hasFiles ? L10n.deleteIPA : L10n.removeFromList)
+        alert.addButton(withTitle: L10n.cancel)
+        alert.buttons.first?.hasDestructiveAction = true
+        let present: (NSApplication.ModalResponse) -> Void = { response in
+            guard response == .alertFirstButtonReturn else { return }
+            Session.shared.deleteDownloads(jobs.map(\.id))
+        }
+        if let window = view.window {
+            alert.beginSheetModal(for: window, completionHandler: present)
+        } else {
+            present(alert.runModal())
+        }
+    }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        let jobs = actionJobs()
+        switch menuItem.action {
+        case #selector(revealSelected):
+            return jobs.contains { $0.fileExists }
+        case #selector(deleteSelected), #selector(delete(_:)):
+            return jobs.contains(where: \.canDelete)
+        default:
+            return true
+        }
+    }
+
+    private func actionJobs() -> [DownloadJob] {
+        let rows: IndexSet
+        if table.clickedRow >= 0 {
+            if table.selectedRowIndexes.contains(table.clickedRow) {
+                rows = table.selectedRowIndexes
+            } else {
+                rows = IndexSet(integer: table.clickedRow)
+            }
+        } else {
+            rows = table.selectedRowIndexes
+        }
+        return rows.compactMap { row in
+            guard row >= 0, row < filtered.count else { return nil }
+            return filtered[row]
+        }
+    }
+
+    private func updateDeleteButton() {
+        let jobs = table.selectedRowIndexes.compactMap { row -> DownloadJob? in
+            guard row >= 0, row < filtered.count else { return nil }
+            return filtered[row]
+        }
+        deleteButton.isEnabled = jobs.contains(where: \.canDelete)
+        deleteButton.title = jobs.contains(where: \.fileExists) ? L10n.deleteIPA : L10n.removeFromList
+    }
+
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        let jobs = actionJobs()
+        if let item = menu.items.last {
+            item.title = jobs.contains(where: \.fileExists) ? L10n.deleteIPA : L10n.removeFromList
+        }
+    }
+
+    private func makeMenu() -> NSMenu {
+        let menu = NSMenu()
+        menu.delegate = self
+        menu.addItem(withTitle: L10n.showInFinder, action: #selector(revealSelected), keyEquivalent: "")
+        menu.addItem(.separator())
+        menu.addItem(withTitle: L10n.deleteIPA, action: #selector(deleteSelected), keyEquivalent: "")
+        menu.items.forEach { $0.target = self }
+        return menu
+    }
+}
+
+final class DownloadTableView: NSTableView {
+    var onDeleteKey: (() -> Void)?
+
+    override func keyDown(with event: NSEvent) {
+        if event.specialKey == .delete || event.specialKey == .deleteForward {
+            onDeleteKey?()
+            return
+        }
+        super.keyDown(with: event)
     }
 }
 
@@ -221,7 +346,7 @@ final class DownloadTableCellView: NSTableCellView {
         if let path = job.outputPath {
             pathLabel.stringValue = Formatters.homeRelative(path)
         } else {
-            pathLabel.stringValue = job.errorMessage ?? job.bundleID
+            pathLabel.stringValue = (job.errorMessage ?? job.bundleID).localized()
         }
         switch job.status {
         case .succeeded:

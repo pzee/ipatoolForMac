@@ -4,7 +4,7 @@ struct IPAToolService {
     func accountInfo() async throws -> AccountInfo {
         let envelope = try await run(["auth", "info"])
         guard let email = envelope.email, !email.isEmpty else {
-            throw IPAToolError.failed("当前没有登录账号")
+            throw IPAToolError.failed(L10n.noAccount)
         }
         return AccountInfo(
             name: envelope.name ?? email,
@@ -103,7 +103,7 @@ struct IPAToolService {
         }
         let envelope = try await run(arguments)
         guard let output = envelope.output, !output.isEmpty else {
-            throw IPAToolError.failed("下载完成，但没有返回文件路径")
+            throw IPAToolError.failed(L10n.downloadNoPath)
         }
         return DownloadResult(outputPath: output, purchased: envelope.purchased ?? false)
     }
@@ -132,19 +132,21 @@ struct IPAToolService {
         if result.status != 0 {
             let message = envelopes.last?.errorMessage
                 ?? result.stderr.trimmingCharacters(in: .whitespacesAndNewlines)
-            throw IPAToolError.failed(message.isEmpty ? "ipatool 退出码 \(result.status)" : message)
+            throw IPAToolError.failed(message.isEmpty ? String(format: L10n.ipatoolExitCode, result.status) : message)
         }
         if let last = envelopes.last {
             return last
         }
-        throw IPAToolError.failed("ipatool 没有返回可解析的 JSON")
+        throw IPAToolError.failed(L10n.ipatoolNoJSON)
     }
 
     static func resolveBinary() throws -> URL {
+        #if !arch(x86_64)
         if let bundled = Bundle.main.url(forAuxiliaryExecutable: "ipatool"),
            FileManager.default.isExecutableFile(atPath: bundled.path) {
             return bundled
         }
+        #endif
         let fallbacks = [
             "/opt/homebrew/bin/ipatool",
             "/usr/local/bin/ipatool"
@@ -177,7 +179,11 @@ private enum ProcessRunner {
             process.waitUntilExit()
             let stdout = String(data: outPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
             let stderr = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-            return Result(stdout: stdout, stderr: stderr, status: process.terminationStatus)
+            let result = Result(stdout: stdout, stderr: stderr, status: process.terminationStatus)
+            if result.status == 0 {
+                KeychainAccess.allowIpatoolWithoutPrompt()
+            }
+            return result
         }.value
     }
 }

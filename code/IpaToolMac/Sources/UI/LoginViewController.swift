@@ -147,12 +147,12 @@ final class LoginViewController: NSViewController, NSTextFieldDelegate {
         let password = passwordField.stringValue
         let code = authField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !email.isEmpty else {
-            showError("请输入 Apple ID")
+            showError(L10n.enterAppleID)
             view.window?.makeFirstResponder(emailField)
             return
         }
         guard !password.isEmpty else {
-            showError("请输入密码")
+            showError(L10n.enterPassword)
             view.window?.makeFirstResponder(passwordField)
             return
         }

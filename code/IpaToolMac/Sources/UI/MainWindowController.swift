@@ -36,7 +36,7 @@ final class MainWindowController: NSWindowController, NSToolbarDelegate, NSSearc
 
         sidebar.onSelect = { section in
             guard Session.shared.isLoggedIn else {
-                Session.shared.setStatus("请先登录", error: true, busy: false)
+                Session.shared.setStatus(L10n.pleaseSignIn, error: true, busy: false)
                 return
             }
             Session.shared.selectSection(section)

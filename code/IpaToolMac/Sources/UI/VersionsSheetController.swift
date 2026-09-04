@@ -15,7 +15,7 @@ final class VersionsSheetController: NSWindowController, NSTableViewDataSource, 
             backing: .buffered,
             defer: false
         )
-        window.title = "\(app.displayName) 的历史版本"
+        window.title = String(format: L10n.versionsTitle, app.displayName)
         super.init(window: window)
         setup()
         load()
@@ -104,7 +104,7 @@ final class VersionsSheetController: NSWindowController, NSTableViewDataSource, 
                 let ids = try await Session.shared.service.listVersions(app: self.app)
                 self.versions = ids.reversed().prefix(80).map { VersionInfo(versionID: $0, displayVersion: nil, releaseDate: nil) }
                 self.table.reloadData()
-                self.status.stringValue = "\(self.versions.count) 个版本"
+                self.status.stringValue = String(format: L10n.versionCount, self.versions.count)
                 await self.loadMetadata()
             } catch {
                 self.status.stringValue = error.localizedDescription

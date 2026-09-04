@@ -57,14 +57,28 @@ final class DownloadStore {
                 )
                 if job.status == .running {
                     job.status = .failed
-                    job.errorMessage = "应用退出，下载中断"
+                    job.errorMessage = kL_downloadInterrupted
+                }
+                if job.errorMessage == "应用退出，下载中断" {
+                    job.errorMessage = kL_downloadInterrupted
                 }
                 jobs.append(job)
             }
             result.close()
         }
-        jobs.filter { $0.errorMessage == "应用退出，下载中断" }.forEach(upsert)
-        return jobs
+        jobs.filter { $0.errorMessage == kL_downloadInterrupted }.forEach(upsert)
+        let stale = jobs.filter { $0.status == .succeeded && !$0.fileExists }
+        stale.forEach { delete($0.id) }
+        return jobs.filter { job in stale.contains { $0.id == job.id } == false }
+    }
+
+    func delete(_ id: UUID) {
+        queue.inDatabase { db in
+            _ = db.executeUpdate(
+                "DELETE FROM downloads WHERE id = ?",
+                withArgumentsIn: [id.uuidString]
+            )
+        }
     }
 
     func upsert(_ job: DownloadJob) {
