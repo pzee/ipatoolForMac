@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-/// 首次启动时把 App 和内置 ipatool 加入该凭证的信任列表。
+/// 首次启动时把 App 和本机安装的 ipatool 加入该凭证的信任列表。
 /// 之后只读取现有设置，不再重复修改或弹窗。
 enum KeychainAccess {
     static let serviceName = "ipatool-auth.service"

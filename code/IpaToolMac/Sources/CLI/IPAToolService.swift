@@ -141,12 +141,6 @@ struct IPAToolService {
     }
 
     static func resolveBinary() throws -> URL {
-        #if !arch(x86_64)
-        if let bundled = Bundle.main.url(forAuxiliaryExecutable: "ipatool"),
-           FileManager.default.isExecutableFile(atPath: bundled.path) {
-            return bundled
-        }
-        #endif
         let fallbacks = [
             "/opt/homebrew/bin/ipatool",
             "/usr/local/bin/ipatool"

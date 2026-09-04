@@ -60,9 +60,9 @@
 		93E8B82BBF4844D5FDDBF3A8 /* KeychainAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccess.swift; sourceTree = "<group>"; };
 		957312993999E733BE2A3FAF /* ArtworkStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkStore.swift; sourceTree = "<group>"; };
 		96E7DDCB7EE58BD68BC6A0FD /* VersionsSheetController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionsSheetController.swift; sourceTree = "<group>"; };
-		A000158C0E1FCF2E114CE2BB /* IPA Tool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IPA Tool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4BC8E29D264D1BF7EFB4614 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		B8813FF27EAF5E1761294855 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C1F48257673500461116E997 /* IPA Tool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IPA Tool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDFA0E79F03E7F3B748FBF01 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		D04E585497C5D67BE4120474 /* IPAToolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPAToolService.swift; sourceTree = "<group>"; };
 		E047F01BFF7C39804BBD1954 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
@@ -105,7 +105,7 @@
 		314E5D20B9EE5D6126D89124 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A000158C0E1FCF2E114CE2BB /* IPA Tool.app */,
+				C1F48257673500461116E997 /* IPA Tool.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -200,7 +200,6 @@
 				AD663CC22B4E6F16825D0AE2 /* Sources */,
 				AF76FAE4DE5D42F734B92731 /* Resources */,
 				6CBA6A0651BA9BB0E6DE8030 /* Frameworks */,
-				5C0848EBCDF8E1D43826B2FF /* Embed ipatool CLI */,
 			);
 			buildRules = (
 			);
@@ -212,7 +211,7 @@
 				FB03519E1172E3597C4E4606 /* FMDB */,
 			);
 			productName = IpaToolMac;
-			productReference = A000158C0E1FCF2E114CE2BB /* IPA Tool.app */;
+			productReference = C1F48257673500461116E997 /* IPA Tool.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -265,29 +264,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		5C0848EBCDF8E1D43826B2FF /* Embed ipatool CLI */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Embed ipatool CLI";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/ipatool",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -euo pipefail\nexport PATH=\"/opt/homebrew/bin:/usr/local/go/bin:/usr/local/bin:$PATH\"\nHELPERS=\"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Helpers\"\nmkdir -p \"${HELPERS}\"\nDEST=\"${HELPERS}/ipatool\"\nREPO_ROOT=\"${SRCROOT}/..\"\nrm -f \"${DEST}\"\nif command -v go >/dev/null 2>&1; then\n  (cd \"${REPO_ROOT}\" && go build -o \"${DEST}\" .)\nelif [ -x /opt/homebrew/bin/ipatool ]; then\n  cp /opt/homebrew/bin/ipatool \"${DEST}\"\nelif [ -x /usr/local/bin/ipatool ]; then\n  cp /usr/local/bin/ipatool \"${DEST}\"\nelse\n  echo \"error: go is not installed and ipatool was not found in PATH\" >&2\n  exit 1\nfi\nchmod 755 \"${DEST}\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		AD663CC22B4E6F16825D0AE2 /* Sources */ = {
@@ -343,7 +319,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
@@ -355,7 +331,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;
@@ -367,7 +343,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
@@ -379,7 +355,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;

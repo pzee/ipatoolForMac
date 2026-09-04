@@ -26,6 +26,7 @@ targets:
   IpaToolMac:
     type: application
     platform: macOS
+    productName: IPA Tool
     sources:
       - path: IpaToolMac
         excludes:
@@ -39,8 +40,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.ipatool.mac
         PRODUCT_NAME: IPA Tool
-        MARKETING_VERSION: "1.0.1"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "1.0.2"
+        CURRENT_PROJECT_VERSION: "4"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: IPA Tool
         INFOPLIST_KEY_CFBundleName: IPA Tool
@@ -53,30 +54,6 @@ targets:
         COMBINE_HIDPI_IMAGES: YES
         LD_RUNPATH_SEARCH_PATHS:
           - "@executable_path/../Frameworks"
-    postBuildScripts:
-      - name: Embed ipatool CLI
-        basedOnDependencyAnalysis: false
-        outputFiles:
-          - $(BUILT_PRODUCTS_DIR)/$(CONTENTS_FOLDER_PATH)/Helpers/ipatool
-        script: |
-          set -euo pipefail
-          export PATH="/opt/homebrew/bin:/usr/local/go/bin:/usr/local/bin:$PATH"
-          HELPERS="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/Helpers"
-          mkdir -p "${HELPERS}"
-          DEST="${HELPERS}/ipatool"
-          REPO_ROOT="${SRCROOT}/.."
-          rm -f "${DEST}"
-          if command -v go >/dev/null 2>&1; then
-            (cd "${REPO_ROOT}" && go build -o "${DEST}" .)
-          elif [ -x /opt/homebrew/bin/ipatool ]; then
-            cp /opt/homebrew/bin/ipatool "${DEST}"
-          elif [ -x /usr/local/bin/ipatool ]; then
-            cp /usr/local/bin/ipatool "${DEST}"
-          else
-            echo "error: go is not installed and ipatool was not found in PATH" >&2
-            exit 1
-          fi
-          chmod 755 "${DEST}"
 schemes:
   IpaToolMac:
     build:
