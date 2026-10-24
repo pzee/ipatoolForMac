@@ -52,7 +52,7 @@ final class SidebarViewController: NSViewController {
         stack.spacing = 12
         view.addSubview(stack)
         stack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(NSEdgeInsets(top: 10, left: 10, bottom: 12, right: 10))
+            make.edges.equalTo(view.safeAreaLayoutGuide).inset(NSEdgeInsets(top: 10, left: 10, bottom: 12, right: 10))
         }
         itemStack.snp.makeConstraints { $0.width.equalTo(stack.snp.width) }
         footer.snp.makeConstraints { $0.width.equalTo(stack.snp.width) }

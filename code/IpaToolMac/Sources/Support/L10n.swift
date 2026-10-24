@@ -119,4 +119,12 @@ enum L10n {
     static var ipatoolExitCode: String { kL_ipatoolExitCode.localized() }
     static var versionsTitle: String { kL_versionsTitle.localized() }
     static var versionCount: String { kL_versionCount.localized() }
+    static var retry: String { kL_retry.localized() }
+    static var loadingPage: String { kL_loadingPage.localized() }
+    static var cancelled: String { kL_cancelled.localized() }
+    static var cancelling: String { kL_cancelling.localized() }
+    static var cancelDownload: String { kL_cancelDownload.localized() }
+    static var preparingDownload: String { kL_preparingDownload.localized() }
+    static var processingDownload: String { kL_processingDownload.localized() }
+    static var downloadAlreadyQueued: String { kL_downloadAlreadyQueued.localized() }
 }

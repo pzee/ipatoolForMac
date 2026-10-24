@@ -9,31 +9,49 @@
 /* Begin PBXBuildFile section */
 		00A632E6D772981E0380ED5C /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9064B606B3C9E99E80132DA3 /* DownloadsViewController.swift */; };
 		1418A82FFB10A422BE673692 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A18413B22EC56F8CAE995FF4 /* SnapKit */; };
+		154EB47C09AAA875667CF6D3 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFA0E79F03E7F3B748FBF01 /* DownloadStore.swift */; };
 		1EC896404485E359F51F8471 /* IPAToolService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04E585497C5D67BE4120474 /* IPAToolService.swift */; };
 		1F6B46F8127A1A7D7E102C42 /* Localize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E34DF0D750AA3366D823393 /* Localize.swift */; };
+		2044A273E0CDAD4D3B593D6C /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366C500F12B72CB5A82A3041 /* Layout.swift */; };
 		20902659F186919C58A4BE83 /* LocalizationConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D0DDA57910E49E414B7A83 /* LocalizationConstant.swift */; };
+		2179884810DE5E32758BB1D6 /* FlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3D09BB03E023D75019C81F /* FlowTests.swift */; };
+		23B92B31411070ED72D93217 /* DownloadsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9064B606B3C9E99E80132DA3 /* DownloadsViewController.swift */; };
+		2ACD3DB024E2569B693738F0 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957312993999E733BE2A3FAF /* ArtworkStore.swift */; };
+		2F2D9FDD16DA73BA5C7986A8 /* StoreFront.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F674E40C4352A0C601DC2FF /* StoreFront.swift */; };
+		3416DD0FC4ABEBF418D8B9E2 /* IPAToolService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04E585497C5D67BE4120474 /* IPAToolService.swift */; };
 		402E4C21A660C9878BB78468 /* ContentHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00377A9B241AD1E25067EC24 /* ContentHostViewController.swift */; };
 		416A16A680C58CED1EE03674 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3C2BB4E60E7CA608EE9D21E /* SidebarViewController.swift */; };
 		4675B846A0F40737EB3E0B68 /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047F01BFF7C39804BBD1954 /* L10n.swift */; };
 		4C88F056D465BF27045AE36F /* KeychainAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E8B82BBF4844D5FDDBF3A8 /* KeychainAccess.swift */; };
 		5002B4B073357263254360C3 /* VersionsSheetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96E7DDCB7EE58BD68BC6A0FD /* VersionsSheetController.swift */; };
 		52B3C5AB97308E1FEA2D409C /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4BC8E29D264D1BF7EFB4614 /* LoginViewController.swift */; };
+		564AC5DCAE503B602758C50A /* Localize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E34DF0D750AA3366D823393 /* Localize.swift */; };
 		565B404039C68CE0FEB56E9B /* AppListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC4F166C74A300BB003602D /* AppListViewController.swift */; };
+		66C1AA79D66EF2482E4ECCBB /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453E352EF2A48F2668A2C933 /* Models.swift */; };
 		6954D6256858BBE1EF43D894 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 453E352EF2A48F2668A2C933 /* Models.swift */; };
 		6C794212248889AFEC1A9AFF /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3312E402D3389F0E1A6302CC /* main.swift */; };
 		7003F62D849BD3DA09B574B8 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CEB147A9B9766A6289B591 /* AppLanguage.swift */; };
 		72077E3449C69C1D7018954F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 61DB8C3F6A70E41326B245CD /* Localizable.strings */; };
+		7681F21FDC23B64DE3E1314D /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46CEB147A9B9766A6289B591 /* AppLanguage.swift */; };
 		77084AD40D2458BC8289B310 /* AccountPopoverController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0647F98D675B84762BA337D3 /* AccountPopoverController.swift */; };
 		776B078FED25663F89CD5C47 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB5F9622DCBE68764AE4C22 /* AppDelegate.swift */; };
+		8584F90004DD3F8A21D6649C /* KeychainAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E8B82BBF4844D5FDDBF3A8 /* KeychainAccess.swift */; };
+		8B6D0FDB4361C125A879E434 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574C7CC93B5866DD0F07AF21 /* ProcessRunner.swift */; };
+		8C450A219F672ADB16733943 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = C3CE89A744425FFD524ED162 /* SnapKit */; };
+		9751563BF59253B33154FE4F /* LocalizationConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D0DDA57910E49E414B7A83 /* LocalizationConstant.swift */; };
 		9B29AA1C34D4DD747CAC0005 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB9657F992A180DB9B00DEF /* PurchasesViewController.swift */; };
 		A3FBDE8F311C253BC40C3A29 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFA0E79F03E7F3B748FBF01 /* DownloadStore.swift */; };
 		AB80C12E6895FE86E5211FC7 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A79ED2706D54CB79C79179 /* Session.swift */; };
+		B93F3C0C4BB3352569B9113B /* FMDB in Frameworks */ = {isa = PBXBuildFile; productRef = 54F9DAC4E3D3BF2A3B79132C /* FMDB */; };
 		C6D1CE1B652601499B46A301 /* ArtworkStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 957312993999E733BE2A3FAF /* ArtworkStore.swift */; };
 		CB88DA57BEC6102C4DE37277 /* InspectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38536DEC6C6F99B8885937F2 /* InspectorViewController.swift */; };
 		CD18E572AE08FBF6CF96ADE5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B8813FF27EAF5E1761294855 /* Assets.xcassets */; };
+		D90DC21BC429826CD584A377 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A79ED2706D54CB79C79179 /* Session.swift */; };
 		DD51D97B402F5AD6FC3BCA2C /* FMDB in Frameworks */ = {isa = PBXBuildFile; productRef = FB03519E1172E3597C4E4606 /* FMDB */; };
+		E22F95FF98DAA29DE278F86E /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = E047F01BFF7C39804BBD1954 /* L10n.swift */; };
 		EA4B0E69B6AC4F0218AEC930 /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FBF38C3517A67B05960668 /* MainWindowController.swift */; };
 		F0E6CEFA03075F652EF018AB /* StoreFront.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F674E40C4352A0C601DC2FF /* StoreFront.swift */; };
+		F5D94E43C02A2E8466DBD2B7 /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574C7CC93B5866DD0F07AF21 /* ProcessRunner.swift */; };
 		F77494D1F846F38351346288 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B60DBFBC817F9BFC019A91D /* SearchViewController.swift */; };
 		FFB1474028A76D83981CA07E /* Layout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366C500F12B72CB5A82A3041 /* Layout.swift */; };
 /* End PBXBuildFile section */
@@ -51,10 +69,12 @@
 		3E34DF0D750AA3366D823393 /* Localize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localize.swift; sourceTree = "<group>"; };
 		453E352EF2A48F2668A2C933 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		46CEB147A9B9766A6289B591 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		574C7CC93B5866DD0F07AF21 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
 		69D0DDA57910E49E414B7A83 /* LocalizationConstant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationConstant.swift; sourceTree = "<group>"; };
 		6F674E40C4352A0C601DC2FF /* StoreFront.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreFront.swift; sourceTree = "<group>"; };
 		73E963DFD9A7C8D996128003 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7A91ADB73D39B9A7223F6ED2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		8C3D09BB03E023D75019C81F /* FlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowTests.swift; sourceTree = "<group>"; };
 		9064B606B3C9E99E80132DA3 /* DownloadsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsViewController.swift; sourceTree = "<group>"; };
 		927B558B4157602CBE30C806 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		93E8B82BBF4844D5FDDBF3A8 /* KeychainAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainAccess.swift; sourceTree = "<group>"; };
@@ -67,6 +87,7 @@
 		D04E585497C5D67BE4120474 /* IPAToolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPAToolService.swift; sourceTree = "<group>"; };
 		E047F01BFF7C39804BBD1954 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		E1FBF38C3517A67B05960668 /* MainWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
+		E4D6762748C9751C6C2BDC13 /* IpaToolMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IpaToolMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3C2BB4E60E7CA608EE9D21E /* SidebarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewController.swift; sourceTree = "<group>"; };
 		FFB5F9622DCBE68764AE4C22 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -78,6 +99,15 @@
 			files = (
 				1418A82FFB10A422BE673692 /* SnapKit in Frameworks */,
 				DD51D97B402F5AD6FC3BCA2C /* FMDB in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7B2FCC55986472D65BF880DE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8C450A219F672ADB16733943 /* SnapKit in Frameworks */,
+				B93F3C0C4BB3352569B9113B /* FMDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +136,7 @@
 			isa = PBXGroup;
 			children = (
 				C1F48257673500461116E997 /* IPA Tool.app */,
+				E4D6762748C9751C6C2BDC13 /* IpaToolMacTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -114,6 +145,7 @@
 			isa = PBXGroup;
 			children = (
 				0E9599CB231AAFEA0FFE28D7 /* IpaToolMac */,
+				ED5355524B6176F9591B0607 /* Tests */,
 				314E5D20B9EE5D6126D89124 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -185,14 +217,43 @@
 				D04E585497C5D67BE4120474 /* IPAToolService.swift */,
 				93E8B82BBF4844D5FDDBF3A8 /* KeychainAccess.swift */,
 				453E352EF2A48F2668A2C933 /* Models.swift */,
+				574C7CC93B5866DD0F07AF21 /* ProcessRunner.swift */,
 				6F674E40C4352A0C601DC2FF /* StoreFront.swift */,
 			);
 			path = CLI;
 			sourceTree = "<group>";
 		};
+		ED5355524B6176F9591B0607 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				8C3D09BB03E023D75019C81F /* FlowTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		23FADA19FF8F4629CEF80AFD /* IpaToolMacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A173E1A2991523CD65FD877A /* Build configuration list for PBXNativeTarget "IpaToolMacTests" */;
+			buildPhases = (
+				17D7EA47F3D7C33C53C2FAFE /* Sources */,
+				7B2FCC55986472D65BF880DE /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IpaToolMacTests;
+			packageProductDependencies = (
+				C3CE89A744425FFD524ED162 /* SnapKit */,
+				54F9DAC4E3D3BF2A3B79132C /* FMDB */,
+			);
+			productName = IpaToolMacTests;
+			productReference = E4D6762748C9751C6C2BDC13 /* IpaToolMacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		2A6F5A7587E57353F0FCF5C5 /* IpaToolMac */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9A5EC3C123C6145FBF3761E9 /* Build configuration list for PBXNativeTarget "IpaToolMac" */;
@@ -223,6 +284,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					23FADA19FF8F4629CEF80AFD = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
 					2A6F5A7587E57353F0FCF5C5 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Manual;
@@ -249,6 +314,7 @@
 			projectRoot = "";
 			targets = (
 				2A6F5A7587E57353F0FCF5C5 /* IpaToolMac */,
+				23FADA19FF8F4629CEF80AFD /* IpaToolMacTests */,
 			);
 		};
 /* End PBXProject section */
@@ -266,6 +332,28 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		17D7EA47F3D7C33C53C2FAFE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7681F21FDC23B64DE3E1314D /* AppLanguage.swift in Sources */,
+				2ACD3DB024E2569B693738F0 /* ArtworkStore.swift in Sources */,
+				154EB47C09AAA875667CF6D3 /* DownloadStore.swift in Sources */,
+				23B92B31411070ED72D93217 /* DownloadsViewController.swift in Sources */,
+				2179884810DE5E32758BB1D6 /* FlowTests.swift in Sources */,
+				3416DD0FC4ABEBF418D8B9E2 /* IPAToolService.swift in Sources */,
+				8584F90004DD3F8A21D6649C /* KeychainAccess.swift in Sources */,
+				E22F95FF98DAA29DE278F86E /* L10n.swift in Sources */,
+				2044A273E0CDAD4D3B593D6C /* Layout.swift in Sources */,
+				9751563BF59253B33154FE4F /* LocalizationConstant.swift in Sources */,
+				564AC5DCAE503B602758C50A /* Localize.swift in Sources */,
+				66C1AA79D66EF2482E4ECCBB /* Models.swift in Sources */,
+				8B6D0FDB4361C125A879E434 /* ProcessRunner.swift in Sources */,
+				D90DC21BC429826CD584A377 /* Session.swift in Sources */,
+				2F2D9FDD16DA73BA5C7986A8 /* StoreFront.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AD663CC22B4E6F16825D0AE2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -288,6 +376,7 @@
 				52B3C5AB97308E1FEA2D409C /* LoginViewController.swift in Sources */,
 				EA4B0E69B6AC4F0218AEC930 /* MainWindowController.swift in Sources */,
 				6954D6256858BBE1EF43D894 /* Models.swift in Sources */,
+				F5D94E43C02A2E8466DBD2B7 /* ProcessRunner.swift in Sources */,
 				9B29AA1C34D4DD747CAC0005 /* PurchasesViewController.swift in Sources */,
 				F77494D1F846F38351346288 /* SearchViewController.swift in Sources */,
 				AB80C12E6895FE86E5211FC7 /* Session.swift in Sources */,
@@ -319,7 +408,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
@@ -331,19 +420,35 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;
 			};
 			name = Debug;
 		};
+		4229949BA4BB0D48C0F01155 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.IpaToolMacTests;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 		5E9B6F3EBAED90A92E1B6DED /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
@@ -355,7 +460,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;
@@ -493,6 +598,22 @@
 			};
 			name = Release;
 		};
+		CB1E454AB2343D4CB92130D1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.IpaToolMacTests;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -510,6 +631,15 @@
 			buildConfigurations = (
 				3A899758ACA1894398D197B7 /* Debug */,
 				5E9B6F3EBAED90A92E1B6DED /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A173E1A2991523CD65FD877A /* Build configuration list for PBXNativeTarget "IpaToolMacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB1E454AB2343D4CB92130D1 /* Debug */,
+				4229949BA4BB0D48C0F01155 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -536,7 +666,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		54F9DAC4E3D3BF2A3B79132C /* FMDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D9A2CAAC228D48E5DDD3636B /* XCRemoteSwiftPackageReference "fmdb" */;
+			productName = FMDB;
+		};
 		A18413B22EC56F8CAE995FF4 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4655DC0D538A7CF08E3B8EDB /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		C3CE89A744425FFD524ED162 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4655DC0D538A7CF08E3B8EDB /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;

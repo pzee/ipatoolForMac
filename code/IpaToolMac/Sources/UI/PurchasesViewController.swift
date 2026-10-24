@@ -5,10 +5,15 @@ final class PurchasesViewController: NSViewController {
     let list = AppListViewController()
     let inspector = InspectorViewController()
 
-    private var page = 1
-    private var total = 0
+    private var pagination = PurchasePagination()
     private var allApps: [StoreApp] = []
+    private var filterText = ""
+    private var loadTask: Task<Void, Never>?
+    private var retryPage: Int?
+    private var accountEmail: String?
     private let countLabel = NSTextField(labelWithString: "")
+    private let spinner = NSProgressIndicator()
+    private let retryButton = NSButton(title: L10n.retry, target: nil, action: nil)
     private let prevButton = NSButton(title: L10n.previous, target: nil, action: nil)
     private let nextButton = NSButton(title: L10n.next, target: nil, action: nil)
     private var loaded = false
@@ -25,8 +30,19 @@ final class PurchasesViewController: NSViewController {
         nextButton.target = self
         prevButton.action = #selector(previousPage)
         nextButton.action = #selector(nextPage)
+        retryButton.bezelStyle = .roundRect
+        retryButton.controlSize = .small
+        retryButton.target = self
+        retryButton.action = #selector(retryLoading)
+        retryButton.isHidden = true
+        spinner.style = .spinning
+        spinner.controlSize = .small
+        spinner.isDisplayedWhenStopped = false
+        spinner.setAccessibilityLabel(L10n.loadingPurchases)
+        countLabel.lineBreakMode = .byTruncatingTail
+        countLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
-        let pager = NSStackView(views: [prevButton, nextButton])
+        let pager = NSStackView(views: [spinner, retryButton, prevButton, nextButton])
         pager.spacing = 6
         let header = NSView()
         header.addSubview(countLabel)
@@ -34,6 +50,7 @@ final class PurchasesViewController: NSViewController {
         countLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(14)
             make.centerY.equalToSuperview()
+            make.trailing.lessThanOrEqualTo(pager.snp.leading).offset(-12)
         }
         pager.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-14)
@@ -81,61 +98,117 @@ final class PurchasesViewController: NSViewController {
                 }
             }
         }
+        accountEmail = Session.shared.account?.email
+        NotificationCenter.default.addObserver(self, selector: #selector(accountChanged), name: .sessionAccountDidChange, object: nil)
         updatePager()
     }
 
     override func viewWillAppear() {
         super.viewWillAppear()
         if !loaded {
-            loaded = true
             reload()
         }
     }
 
     func reload() {
+        loadPage(pagination.page)
+    }
+
+    private func loadPage(_ target: Int) {
+        guard pagination.begin(target) else { return }
+        retryPage = nil
+        retryButton.title = L10n.cancel
+        retryButton.toolTip = nil
+        retryButton.isHidden = false
+        countLabel.stringValue = String(format: L10n.loadingPage, target)
+        spinner.startAnimation(nil)
+        updatePager()
         Session.shared.setStatus(L10n.loadingPurchases, error: false, busy: true)
-        let current = page
-        Task {
+        loadTask = Task {
             do {
-                let result = try await Session.shared.service.listPurchases(page: current)
+                let result = try await Session.shared.service.listPurchases(page: target)
+                guard !Task.isCancelled else { return }
+                pagination.finish(result)
+                retryButton.isHidden = true
+                loaded = true
                 allApps = result.apps
-                total = result.totalCount
-                list.apps = result.apps
+                filter(filterText)
                 countLabel.stringValue = String(format: L10n.pageFormat, result.page, result.count, result.totalCount)
                 Session.shared.setStatus(L10n.ready, error: false, busy: false)
-                list.selectFirst()
-                updatePager()
             } catch {
+                guard !Task.isCancelled else { return }
+                pagination.fail()
+                retryPage = target
+                retryButton.title = L10n.retry
+                retryButton.isHidden = false
+                retryButton.toolTip = error.localizedDescription
+                countLabel.stringValue = loaded
+                    ? String(format: L10n.pageFormat, pagination.page, allApps.count, pagination.total)
+                    : L10n.failed
                 Session.shared.setStatus(error.localizedDescription, error: true, busy: false)
             }
+            spinner.stopAnimation(nil)
+            updatePager()
+            loadTask = nil
         }
     }
 
     func filter(_ query: String) {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        guard !q.isEmpty else {
-            list.apps = allApps
-            return
+        filterText = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        list.apps = filterText.isEmpty ? allApps : allApps.filter {
+            $0.name.lowercased().contains(filterText) || $0.bundleID.lowercased().contains(filterText)
         }
-        list.apps = allApps.filter {
-            $0.name.lowercased().contains(q) || $0.bundleID.lowercased().contains(q)
-        }
+        list.selectFirst()
     }
 
     @objc private func previousPage() {
-        guard page > 1 else { return }
-        page -= 1
-        reload()
+        guard pagination.canGoBack else { return }
+        loadPage(pagination.page - 1)
     }
 
     @objc private func nextPage() {
-        page += 1
-        reload()
+        guard pagination.canGoForward else { return }
+        loadPage(pagination.page + 1)
+    }
+
+    @objc private func retryLoading() {
+        if pagination.isLoading {
+            retryPage = pagination.loadingPage
+            loadTask?.cancel()
+            loadTask = nil
+            pagination.fail()
+            retryButton.title = L10n.retry
+            spinner.stopAnimation(nil)
+            countLabel.stringValue = loaded
+                ? String(format: L10n.pageFormat, pagination.page, allApps.count, pagination.total)
+                : L10n.cancelled
+            updatePager()
+            Session.shared.setStatus(L10n.ready, error: false, busy: false)
+            return
+        }
+        if let retryPage { loadPage(retryPage) }
+    }
+
+    @objc private func accountChanged() {
+        guard accountEmail != Session.shared.account?.email else { return }
+        accountEmail = Session.shared.account?.email
+        loadTask?.cancel()
+        loadTask = nil
+        pagination = PurchasePagination()
+        loaded = false
+        retryPage = nil
+        retryButton.isHidden = true
+        allApps = []
+        list.apps = []
+        countLabel.stringValue = ""
+        spinner.stopAnimation(nil)
+        updatePager()
+        if view.window != nil, Session.shared.isLoggedIn { reload() }
     }
 
     private func updatePager() {
-        prevButton.isEnabled = page > 1
-        nextButton.isEnabled = page * 20 < max(total, 1)
+        prevButton.isEnabled = pagination.canGoBack
+        nextButton.isEnabled = pagination.canGoForward
     }
 
     private func presentVersions(_ app: StoreApp) {

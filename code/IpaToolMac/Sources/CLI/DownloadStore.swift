@@ -114,6 +114,7 @@ private extension DownloadStatus {
         case .running: return "running"
         case .succeeded: return "succeeded"
         case .failed: return "failed"
+        case .cancelled: return "cancelled"
         }
     }
 
@@ -122,6 +123,7 @@ private extension DownloadStatus {
         case "queued": self = .queued
         case "running": self = .running
         case "succeeded": self = .succeeded
+        case "cancelled": self = .cancelled
         default: self = .failed
         }
     }

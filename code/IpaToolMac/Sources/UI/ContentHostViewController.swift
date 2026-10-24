@@ -19,7 +19,8 @@ final class ContentHostViewController: NSViewController {
             make.height.equalTo(26)
         }
         container.snp.makeConstraints { make in
-            make.top.leading.trailing.equalToSuperview()
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.leading.trailing.equalToSuperview()
             make.bottom.equalTo(statusBar.snp.top)
         }
 

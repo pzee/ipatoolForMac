@@ -46,7 +46,7 @@ struct IPAToolService {
         }
     }
 
-    func listPurchases(page: Int, limit: Int = 20) async throws -> PurchasePage {
+    func listPurchases(page: Int, limit: Int = PurchasePagination.pageSize) async throws -> PurchasePage {
         let envelope = try await run([
             "list-purchases",
             "--page", String(page),
@@ -85,12 +85,17 @@ struct IPAToolService {
         app: StoreApp,
         outputDirectory: URL,
         versionID: String?,
-        purchaseIfNeeded: Bool
+        purchaseIfNeeded: Bool,
+        onProgress: @escaping @Sendable (DownloadProgress) -> Void
     ) async throws -> DownloadResult {
         try FileManager.default.createDirectory(at: outputDirectory, withIntermediateDirectories: true)
+        // Publish only completed packages so cancellation cannot damage an existing IPA.
+        let staging = outputDirectory.appendingPathComponent(".ipatool-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: staging, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: staging) }
         var arguments = [
             "download",
-            "--output", outputDirectory.path
+            "--output", staging.path
         ] + appFlags(app)
         if let platform = app.platform {
             arguments += ["--platform", platform.rawValue]
@@ -101,11 +106,38 @@ struct IPAToolService {
         if purchaseIfNeeded {
             arguments.append("--purchase")
         }
-        let envelope = try await run(arguments)
+        let envelope = try await run(arguments, onProgress: onProgress)
         guard let output = envelope.output, !output.isEmpty else {
             throw IPAToolError.failed(L10n.downloadNoPath)
         }
-        return DownloadResult(outputPath: output, purchased: envelope.purchased ?? false)
+        try Task.checkCancellation()
+        let source = URL(fileURLWithPath: output)
+        guard source.deletingLastPathComponent().standardizedFileURL.path == staging.standardizedFileURL.path,
+              FileManager.default.fileExists(atPath: source.path) else {
+            throw IPAToolError.failed(L10n.downloadNoPath)
+        }
+        let destination = Self.downloadDestination(app: app, fileExtension: source.pathExtension, directory: outputDirectory)
+        try FileManager.default.moveItem(at: source, to: destination)
+        return DownloadResult(outputPath: destination.path, purchased: envelope.purchased ?? false)
+    }
+
+    static func downloadDestination(app: StoreApp, fileExtension: String, directory: URL) -> URL {
+        let cleaned = app.name.replacingOccurrences(of: #"[/\\:\p{Cc}]+"#, with: " ", options: .regularExpression)
+            .replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines.union(CharacterSet(charactersIn: ".")))
+        var name = ""
+        for character in cleaned {
+            guard name.utf8.count + String(character).utf8.count <= 180 else { break }
+            name.append(character)
+        }
+        if name.isEmpty { name = "App \(app.id)" }
+        var destination = directory.appendingPathComponent(name).appendingPathExtension(fileExtension)
+        var suffix = 2
+        while FileManager.default.fileExists(atPath: destination.path) {
+            destination = directory.appendingPathComponent("\(name) (\(suffix))").appendingPathExtension(fileExtension)
+            suffix += 1
+        }
+        return destination
     }
 
     private func appFlags(_ app: StoreApp) -> [String] {
@@ -115,11 +147,17 @@ struct IPAToolService {
         return ["--app-id", String(app.id)]
     }
 
-    private func run(_ arguments: [String]) async throws -> CLIEnvelope {
+    private func run(
+        _ arguments: [String],
+        onProgress: (@Sendable (DownloadProgress) -> Void)? = nil
+    ) async throws -> CLIEnvelope {
         let executable = try Self.resolveBinary()
+        // ipatool suppresses progress in non-interactive mode; stdin stays closed in ProcessRunner.
+        let flags = onProgress == nil ? ["--non-interactive"] : []
         let result = try await ProcessRunner.run(
             executable: executable,
-            arguments: ["--format", "json", "--non-interactive"] + arguments
+            arguments: ["--format", "json"] + flags + arguments,
+            onProgress: onProgress
         )
         let envelopes = CLIEnvelope.parseLines(result.stdout + "\n" + result.stderr)
 
@@ -135,6 +173,7 @@ struct IPAToolService {
             throw IPAToolError.failed(message.isEmpty ? String(format: L10n.ipatoolExitCode, result.status) : message)
         }
         if let last = envelopes.last {
+            KeychainAccess.allowIpatoolWithoutPrompt()
             return last
         }
         throw IPAToolError.failed(L10n.ipatoolNoJSON)
@@ -152,40 +191,10 @@ struct IPAToolService {
     }
 }
 
-private enum ProcessRunner {
-    struct Result {
-        var stdout: String
-        var stderr: String
-        var status: Int32
-    }
-
-    static func run(executable: URL, arguments: [String]) async throws -> Result {
-        try await Task.detached(priority: .userInitiated) {
-            let process = Process()
-            process.executableURL = executable
-            process.arguments = arguments
-            process.standardInput = FileHandle.nullDevice
-            let outPipe = Pipe()
-            let errPipe = Pipe()
-            process.standardOutput = outPipe
-            process.standardError = errPipe
-            try process.run()
-            process.waitUntilExit()
-            let stdout = String(data: outPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-            let stderr = String(data: errPipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-            let result = Result(stdout: stdout, stderr: stderr, status: process.terminationStatus)
-            if result.status == 0 {
-                KeychainAccess.allowIpatoolWithoutPrompt()
-            }
-            return result
-        }.value
-    }
-}
-
-private struct CLIEnvelope: Decodable {
+struct CLIEnvelope: Decodable {
     var level: String?
     var success: Bool?
-    var error: FlexibleString?
+    fileprivate var error: FlexibleString?
     var message: String?
     var name: String?
     var email: String?
@@ -198,10 +207,10 @@ private struct CLIEnvelope: Decodable {
     var purchased: Bool?
     var alreadyOwned: Bool?
     var bundleID: String?
-    var externalVersionIdentifiers: [FlexibleString]?
+    fileprivate var externalVersionIdentifiers: [FlexibleString]?
     var externalVersionID: String?
     var displayVersion: String?
-    var releaseDate: FlexibleString?
+    fileprivate var releaseDate: FlexibleString?
 
     var errorMessage: String? {
         error?.value ?? message

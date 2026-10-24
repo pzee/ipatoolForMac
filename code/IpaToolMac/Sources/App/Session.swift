@@ -6,6 +6,7 @@ extension Notification.Name {
     static let sessionAccountDidChange = Notification.Name("sessionAccountDidChange")
     static let sessionSectionDidChange = Notification.Name("sessionSectionDidChange")
     static let sessionDownloadsDidChange = Notification.Name("sessionDownloadsDidChange")
+    static let sessionDownloadProgressDidChange = Notification.Name("sessionDownloadProgressDidChange")
     static let sessionStatusDidChange = Notification.Name("sessionStatusDidChange")
     static let sessionFolderDidChange = Notification.Name("sessionFolderDidChange")
 }
@@ -25,7 +26,9 @@ final class Session {
 
     var isLoggedIn: Bool { account != nil }
 
-    private var downloadRunning = false
+    private var downloadTask: Task<Void, Never>?
+    private var isTerminating = false
+    private var lastProgressUpdate = Date.distantPast
     private let folderKey = "downloadFolderPath"
     private let store = DownloadStore.shared
     private var folderWatcher: DispatchSourceFileSystemObject?
@@ -65,6 +68,7 @@ final class Session {
             setStatus(L10n.notSignedIn, error: false, busy: false)
         }
         NotificationCenter.default.post(name: .sessionAccountDidChange, object: self)
+        if isLoggedIn { pumpDownloads() }
     }
 
     func login(email: String, password: String, authCode: String?) async throws {
@@ -75,6 +79,7 @@ final class Session {
             ArtworkStore.shared.countryCode = account?.countryCode
             setStatus("\(L10n.signedIn) \(account?.name ?? "")", error: false, busy: false)
             NotificationCenter.default.post(name: .sessionAccountDidChange, object: self)
+            pumpDownloads()
         } catch {
             setStatus(error.localizedDescription, error: true, busy: false)
             throw error
@@ -116,11 +121,56 @@ final class Session {
             errorMessage: nil,
             createdAt: Date()
         )
+        guard !downloads.contains(where: {
+            ($0.status == .queued || $0.status == .running) && $0.isSameDownload(as: job)
+        }) else {
+            setStatus(L10n.downloadAlreadyQueued, error: false, busy: isBusy)
+            return
+        }
         downloads.insert(job, at: 0)
         store.upsert(job)
         NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
         setStatus(String(format: L10n.queuedFormat, job.appName), error: false, busy: isBusy)
         pumpDownloads()
+    }
+
+    func cancelDownload(_ id: UUID) {
+        guard let index = downloads.firstIndex(where: { $0.id == id }), downloads[index].canCancel else { return }
+        if downloads[index].status == .running {
+            downloads[index].isCancelling = true
+            downloadTask?.cancel()
+        } else {
+            downloads[index].status = .cancelled
+            store.upsert(downloads[index])
+        }
+        NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
+    }
+
+    func retryDownload(_ id: UUID) {
+        guard let index = downloads.firstIndex(where: { $0.id == id }), downloads[index].canRetry else { return }
+        var job = downloads[index]
+        guard !downloads.contains(where: {
+            ($0.status == .queued || $0.status == .running) && $0.isSameDownload(as: job)
+        }) else {
+            setStatus(L10n.downloadAlreadyQueued, error: false, busy: isBusy)
+            return
+        }
+        job.status = .queued
+        job.errorMessage = nil
+        job.progress = nil
+        job.createdAt = Date()
+        downloads.remove(at: index)
+        downloads.insert(job, at: 0)
+        store.upsert(job)
+        NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
+        pumpDownloads()
+    }
+
+    func prepareForTermination() async {
+        isTerminating = true
+        let task = downloadTask
+        task?.cancel()
+        await task?.value
     }
 
     func reveal(_ url: URL) {
@@ -191,10 +241,10 @@ final class Session {
     }
 
     private func pumpDownloads() {
-        guard !downloadRunning else { return }
-        guard let index = downloads.firstIndex(where: { $0.status == .queued }) else { return }
-        downloadRunning = true
+        guard downloadTask == nil, isLoggedIn, !isTerminating else { return }
+        guard let index = downloads.lastIndex(where: { $0.status == .queued }) else { return }
         downloads[index].status = .running
+        lastProgressUpdate = .distantPast
         store.upsert(downloads[index])
         let job = downloads[index]
         NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
@@ -213,31 +263,49 @@ final class Session {
         let versionID = job.versionID
         let purchase = job.purchaseIfNeeded
 
-        Task {
+        downloadTask = Task {
             do {
                 let result = try await self.service.download(
                     app: app,
                     outputDirectory: folder,
                     versionID: versionID,
-                    purchaseIfNeeded: purchase
+                    purchaseIfNeeded: purchase,
+                    onProgress: { [weak self] progress in
+                        Task { @MainActor in self?.updateProgress(jobID: job.id, progress: progress) }
+                    }
                 )
                 self.finish(jobID: job.id, path: URL(fileURLWithPath: result.outputPath), error: nil)
+            } catch is CancellationError {
+                self.finish(jobID: job.id, path: nil, error: nil, cancelled: true)
             } catch {
                 self.finish(jobID: job.id, path: nil, error: error.localizedDescription)
             }
         }
     }
 
-    private func finish(jobID: UUID, path: URL?, error: String?) {
+    private func updateProgress(jobID: UUID, progress: DownloadProgress) {
+        guard let index = downloads.firstIndex(where: { $0.id == jobID }),
+              downloads[index].status == .running, !downloads[index].isCancelling else { return }
+        guard Date().timeIntervalSince(lastProgressUpdate) >= 0.15 || progress.percent == 100 else { return }
+        downloads[index].progress = progress
+        lastProgressUpdate = Date()
+        NotificationCenter.default.post(name: .sessionDownloadProgressDidChange, object: self, userInfo: ["jobID": jobID])
+    }
+
+    private func finish(jobID: UUID, path: URL?, error: String?, cancelled: Bool = false) {
         if let index = downloads.firstIndex(where: { $0.id == jobID }) {
-            downloads[index].status = error == nil ? .succeeded : .failed
+            downloads[index].status = cancelled ? .cancelled : (error == nil ? .succeeded : .failed)
             downloads[index].outputPath = path
             downloads[index].errorMessage = error
+            downloads[index].progress = nil
+            downloads[index].isCancelling = false
             store.upsert(downloads[index])
         }
-        downloadRunning = false
+        downloadTask = nil
         NotificationCenter.default.post(name: .sessionDownloadsDidChange, object: self)
-        if let error {
+        if cancelled {
+            setStatus(L10n.cancelled, error: false, busy: false)
+        } else if let error {
             setStatus(error, error: true, busy: false)
         } else if let path {
             setStatus(String(format: L10n.savedTo, Formatters.homeRelative(path)), error: false, busy: false)

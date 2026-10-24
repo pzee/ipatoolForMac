@@ -71,6 +71,7 @@ final class AppListViewController: NSViewController, NSTableViewDataSource, NSTa
     func selectFirst() {
         guard !apps.isEmpty else { return }
         table.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+        table.scrollRowToVisible(0)
         onSelect?(apps[0])
     }
 

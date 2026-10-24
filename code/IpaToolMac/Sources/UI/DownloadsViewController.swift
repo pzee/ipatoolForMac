@@ -114,6 +114,12 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         )
         NotificationCenter.default.addObserver(
             self,
+            selector: #selector(updateProgress(_:)),
+            name: .sessionDownloadProgressDidChange,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
             selector: #selector(refreshPath),
             name: .sessionFolderDidChange,
             object: nil
@@ -151,7 +157,19 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         applyFilter()
     }
 
+    @objc private func updateProgress(_ notification: Notification) {
+        guard let id = notification.userInfo?["jobID"] as? UUID,
+              let job = Session.shared.downloads.first(where: { $0.id == id }) else { return }
+        if let index = jobs.firstIndex(where: { $0.id == id }) { jobs[index] = job }
+        guard let row = filtered.firstIndex(where: { $0.id == id }) else { return }
+        filtered[row] = job
+        (table.view(atColumn: 0, row: row, makeIfNecessary: false) as? DownloadTableCellView)?.updateStatus(job)
+    }
+
     private func applyFilter() {
+        let selectedIDs = Set(table.selectedRowIndexes.compactMap { row in
+            filtered.indices.contains(row) ? filtered[row].id : nil
+        })
         if filterText.isEmpty {
             filtered = jobs
         } else {
@@ -160,6 +178,7 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
             }
         }
         table.reloadData()
+        table.selectRowIndexes(IndexSet(filtered.indices.filter { selectedIDs.contains(filtered[$0].id) }), byExtendingSelection: false)
         scroll.isHidden = filtered.isEmpty
         empty.isHidden = !filtered.isEmpty
         updateDeleteButton()
@@ -180,12 +199,26 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         let cell = tableView.makeView(withIdentifier: id, owner: self) as? DownloadTableCellView ?? DownloadTableCellView()
         cell.identifier = id
         cell.configure(filtered[row])
+        let jobID = filtered[row].id
+        cell.onAction = {
+            guard let job = Session.shared.downloads.first(where: { $0.id == jobID }) else { return }
+            if job.canCancel { Session.shared.cancelDownload(jobID) }
+            else if job.canRetry { Session.shared.retryDownload(jobID) }
+        }
         return cell
     }
 
     @objc private func revealSelected() {
         guard let job = actionJobs().first, let url = job.outputPath, job.fileExists else { return }
         Session.shared.reveal(url)
+    }
+
+    @objc private func cancelSelected() {
+        actionJobs().filter(\.canCancel).forEach { Session.shared.cancelDownload($0.id) }
+    }
+
+    @objc private func retrySelected() {
+        actionJobs().filter(\.canRetry).forEach { Session.shared.retryDownload($0.id) }
     }
 
     @objc func delete(_ sender: Any?) {
@@ -230,6 +263,10 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
             return jobs.contains { $0.fileExists }
         case #selector(deleteSelected), #selector(delete(_:)):
             return jobs.contains(where: \.canDelete)
+        case #selector(cancelSelected):
+            return jobs.contains(where: \.canCancel)
+        case #selector(retrySelected):
+            return jobs.contains(where: \.canRetry)
         default:
             return true
         }
@@ -272,6 +309,8 @@ final class DownloadsViewController: NSViewController, NSTableViewDataSource, NS
         let menu = NSMenu()
         menu.delegate = self
         menu.addItem(withTitle: L10n.showInFinder, action: #selector(revealSelected), keyEquivalent: "")
+        menu.addItem(withTitle: L10n.cancelDownload, action: #selector(cancelSelected), keyEquivalent: "")
+        menu.addItem(withTitle: L10n.retry, action: #selector(retrySelected), keyEquivalent: "")
         menu.addItem(.separator())
         menu.addItem(withTitle: L10n.deleteIPA, action: #selector(deleteSelected), keyEquivalent: "")
         menu.items.forEach { $0.target = self }
@@ -292,10 +331,13 @@ final class DownloadTableView: NSTableView {
 }
 
 final class DownloadTableCellView: NSTableCellView {
+    var onAction: (() -> Void)?
     private let icon = AppIconView()
     private let titleLabel = NSTextField(labelWithString: "")
     private let pathLabel = NSTextField(labelWithString: "")
     private let pill = StatusPillView()
+    private let progressBar = NSProgressIndicator()
+    private let actionButton = NSButton(title: "", target: nil, action: nil)
     private var appID: Int64 = 0
     private var bundleID = ""
 
@@ -307,14 +349,26 @@ final class DownloadTableCellView: NSTableCellView {
         pathLabel.font = .systemFont(ofSize: 11)
         pathLabel.textColor = .secondaryLabelColor
         pathLabel.lineBreakMode = .byTruncatingMiddle
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        pathLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        progressBar.style = .bar
+        progressBar.controlSize = .small
+        progressBar.maxValue = 100
+        actionButton.bezelStyle = .roundRect
+        actionButton.controlSize = .small
+        actionButton.target = self
+        actionButton.action = #selector(performAction)
 
-        let text = NSStackView(views: [titleLabel, pathLabel])
+        let text = NSStackView(views: [titleLabel, pathLabel, progressBar])
         text.orientation = .vertical
         text.alignment = .leading
         text.spacing = 3
         addSubview(icon)
         addSubview(text)
-        addSubview(pill)
+        let actions = NSStackView(views: [pill, actionButton])
+        actions.spacing = 8
+        actions.setHuggingPriority(.required, for: .horizontal)
+        addSubview(actions)
         icon.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(20)
             make.centerY.equalToSuperview()
@@ -323,11 +377,16 @@ final class DownloadTableCellView: NSTableCellView {
         text.snp.makeConstraints { make in
             make.leading.equalTo(icon.snp.trailing).offset(12)
             make.centerY.equalToSuperview()
-            make.trailing.lessThanOrEqualTo(pill.snp.leading).offset(-12)
+            make.trailing.equalTo(actions.snp.leading).offset(-12)
         }
-        pill.snp.makeConstraints { make in
+        actions.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-20)
             make.centerY.equalToSuperview()
+        }
+        progressBar.snp.makeConstraints { make in
+            make.width.equalTo(text)
+        }
+        pill.snp.makeConstraints { make in
             make.height.equalTo(22)
             make.width.greaterThanOrEqualTo(56)
         }
@@ -340,27 +399,64 @@ final class DownloadTableCellView: NSTableCellView {
     }
 
     func configure(_ job: DownloadJob) {
+        titleLabel.stringValue = job.appName
+        updateStatus(job)
+        guard appID != job.appID || bundleID != job.bundleID || icon.image == nil else { return }
         appID = job.appID
         bundleID = job.bundleID
-        titleLabel.stringValue = job.appName
-        if let path = job.outputPath {
+        icon.image = ArtworkStore.shared.placeholder(named: job.appName, size: 40)
+        Task { [weak self] in
+            let image = await ArtworkStore.shared.image(for: job.appID, bundleID: job.bundleID)
+            guard let self, self.appID == job.appID, self.bundleID == job.bundleID, let image else { return }
+            self.icon.image = image
+        }
+    }
+
+    func updateStatus(_ job: DownloadJob) {
+        actionButton.isHidden = !job.canCancel && !job.canRetry && !job.isCancelling
+        actionButton.isEnabled = !job.isCancelling
+        actionButton.title = job.canRetry ? L10n.retry : L10n.cancel
+        actionButton.setAccessibilityLabel(job.canRetry ? L10n.retry : L10n.cancelDownload)
+        progressBar.isHidden = job.status != .running
+        progressBar.isIndeterminate = job.progress == nil || job.isCancelling
+        progressBar.setAccessibilityLabel("\(L10n.downloading) \(job.appName)")
+        if job.status == .running && progressBar.isIndeterminate {
+            progressBar.startAnimation(nil)
+        } else {
+            progressBar.stopAnimation(nil)
+            progressBar.doubleValue = Double(job.progress?.percent ?? 0)
+        }
+        if job.isCancelling {
+            pathLabel.stringValue = L10n.cancelling
+        } else if job.status == .running {
+            if let progress = job.progress {
+                pathLabel.stringValue = progress.percent == 100 ? L10n.processingDownload
+                    : (progress.detail.isEmpty ? L10n.downloading : progress.detail)
+            } else {
+                pathLabel.stringValue = L10n.preparingDownload
+            }
+        } else if let path = job.outputPath {
             pathLabel.stringValue = Formatters.homeRelative(path)
         } else {
             pathLabel.stringValue = (job.errorMessage ?? job.bundleID).localized()
         }
+        pathLabel.toolTip = pathLabel.stringValue
+        let statusTitle = job.isCancelling ? L10n.cancelling
+            : (job.status == .running ? job.progress.map { "\($0.percent)%" } ?? job.status.title : job.status.title)
+        pill.setAccessibilityLabel(statusTitle)
         switch job.status {
         case .succeeded:
             pill.apply(title: job.status.title, textColor: NSColor(red: 0.14, green: 0.54, blue: 0.24, alpha: 1), background: NSColor.systemGreen.withAlphaComponent(0.16))
         case .running, .queued:
-            pill.apply(title: job.status.title, textColor: .controlAccentColor, background: NSColor.controlAccentColor.withAlphaComponent(0.16))
+            pill.apply(title: statusTitle, textColor: .controlAccentColor, background: NSColor.controlAccentColor.withAlphaComponent(0.16))
         case .failed:
             pill.apply(title: job.status.title, textColor: .systemRed, background: NSColor.systemRed.withAlphaComponent(0.12))
+        case .cancelled:
+            pill.apply(title: job.status.title, textColor: .secondaryLabelColor, background: NSColor.labelColor.withAlphaComponent(0.08))
         }
-        icon.image = ArtworkStore.shared.placeholder(named: job.appName, size: 40)
-        Task { [weak self] in
-            let image = await ArtworkStore.shared.image(for: job.appID, bundleID: job.bundleID)
-            guard let self, self.appID == job.appID, let image else { return }
-            self.icon.image = image
-        }
+    }
+
+    @objc private func performAction() {
+        onAction?()
     }
 }

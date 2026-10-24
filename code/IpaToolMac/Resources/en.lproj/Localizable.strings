@@ -116,3 +116,12 @@
 "L_ipatoolExitCode" = "ipatool exit code %d";
 "L_versionsTitle" = "Versions of %@";
 "L_versionCount" = "%d versions";
+
+"L_retry" = "Retry";
+"L_loadingPage" = "Loading page %d…";
+"L_cancelled" = "Cancelled";
+"L_cancelling" = "Cancelling…";
+"L_cancelDownload" = "Cancel Download";
+"L_preparingDownload" = "Preparing download…";
+"L_processingDownload" = "Processing package…";
+"L_downloadAlreadyQueued" = "This version is already queued or downloading.";

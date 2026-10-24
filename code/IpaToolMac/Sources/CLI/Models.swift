@@ -95,6 +95,33 @@ struct PurchasePage {
     var page: Int
 }
 
+struct PurchasePagination {
+    static let pageSize = 20
+    private(set) var page = 1
+    private(set) var total = 0
+    private(set) var loadingPage: Int?
+
+    var isLoading: Bool { loadingPage != nil }
+    var canGoBack: Bool { !isLoading && page > 1 }
+    var canGoForward: Bool { !isLoading && page * Self.pageSize < total }
+
+    mutating func begin(_ target: Int) -> Bool {
+        guard !isLoading, target > 0 else { return false }
+        loadingPage = target
+        return true
+    }
+
+    mutating func finish(_ result: PurchasePage) {
+        page = result.page
+        total = result.totalCount
+        loadingPage = nil
+    }
+
+    mutating func fail() {
+        loadingPage = nil
+    }
+}
+
 struct VersionInfo {
     var versionID: String
     var displayVersion: String?
@@ -111,6 +138,7 @@ enum DownloadStatus: Equatable {
     case running
     case succeeded
     case failed
+    case cancelled
 
     var title: String {
         switch self {
@@ -118,6 +146,7 @@ enum DownloadStatus: Equatable {
         case .running: return L10n.running
         case .succeeded: return L10n.succeeded
         case .failed: return L10n.failed
+        case .cancelled: return L10n.cancelled
         }
     }
 }
@@ -134,6 +163,17 @@ struct DownloadJob: Equatable {
     var outputPath: URL?
     var errorMessage: String?
     var createdAt: Date
+    var progress: DownloadProgress?
+    var isCancelling = false
+
+    var canCancel: Bool { (status == .queued || status == .running) && !isCancelling }
+    var canRetry: Bool { status == .failed || status == .cancelled }
+
+    func isSameDownload(as other: DownloadJob) -> Bool {
+        let sameApp = bundleID.isEmpty || other.bundleID.isEmpty
+            ? appID == other.appID : bundleID == other.bundleID
+        return sameApp && versionID == other.versionID && platform == other.platform
+    }
 
     var fileExists: Bool {
         guard let outputPath else { return false }

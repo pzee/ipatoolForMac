@@ -116,3 +116,12 @@
 "L_ipatoolExitCode" = "ipatool 退出码 %d";
 "L_versionsTitle" = "%@ 的历史版本";
 "L_versionCount" = "%d 个版本";
+
+"L_retry" = "重试";
+"L_loadingPage" = "正在加载第 %d 页…";
+"L_cancelled" = "已取消";
+"L_cancelling" = "正在取消…";
+"L_cancelDownload" = "取消下载";
+"L_preparingDownload" = "正在准备下载…";
+"L_processingDownload" = "正在处理安装包…";
+"L_downloadAlreadyQueued" = "此版本已在排队或下载中。";

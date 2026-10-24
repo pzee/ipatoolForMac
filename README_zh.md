@@ -71,6 +71,8 @@ xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
    - **历史版本** — 列出历史版本并下载其中某一个。
 5. IPA 默认保存在 `~/Downloads/IPA Tool`。可在工具栏、下载页，或 **账户 → 选择下载目录…**（⌘O）里更改。
 
+已购页面加载时会保留当前页，可取消耗时请求或重试失败的页面。下载按入队顺序执行，显示 ipatool 提供的百分比、大小和速度，并支持取消和重试；重试会重新传输，退出应用会取消当前下载。文件处理完成后才放入目标目录，并使用应用名称命名，例如 `TestFlight.ipa`；同名文件会加编号，例如 `TestFlight (2).ipa`，已有文件会保留。
+
 下载下来的 IPA 仍是 FairPlay 加密包，需要用同一个已购账号的设备安装。
 
 ### 快捷键
@@ -85,7 +87,7 @@ xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
 
 ## 和 ipatool 的关系
 
-IPA Tool for Mac 没有自己实现 App Store 协议。界面操作会调用 `ipatool`，并加上 `--format json --non-interactive`，再把结果画到窗口里：
+IPA Tool for Mac 没有自己实现 App Store 协议。界面操作会调用 `ipatool --format json`，再把结果画到窗口里。其他命令使用 `--non-interactive`；下载命令开启终端进度输出，并保持标准输入关闭：
 
 | 界面操作 | 对应的 ipatool 命令 |
 | --- | --- |

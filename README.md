@@ -71,6 +71,8 @@ Then open **IPA Tool** from Applications.
    - **Versions** — list historical versions and download one of them.
 5. Files are saved to `~/Downloads/IPA Tool` by default. Change the folder from the toolbar, the Downloads page, or **Account → Choose Download Folder…** (⌘O).
 
+Purchases keep the current page while loading; you can cancel a slow request or retry a failed page. Downloads run in queue order, show progress, size and speed when reported by ipatool, and offer Cancel and Retry. Retrying starts a new transfer. Quitting cancels the active download. Completed files are published only after processing and named after the app (for example, `TestFlight.ipa`). Duplicate names get a numbered suffix such as `TestFlight (2).ipa`, preserving existing files.
+
 Downloaded IPAs are still FairPlay-encrypted. Install them on a device signed in with the same Apple ID.
 
 ### Shortcuts
@@ -85,7 +87,7 @@ Downloaded IPAs are still FairPlay-encrypted. Install them on a device signed in
 
 ## How it relates to ipatool
 
-IPA Tool for Mac does not reimplement the App Store protocol. It runs `ipatool` with `--format json --non-interactive` and maps the results into the UI:
+IPA Tool for Mac does not reimplement the App Store protocol. It runs `ipatool` with `--format json` and maps the results into the UI. Other commands use `--non-interactive`; downloads enable terminal progress output while keeping standard input closed:
 
 | UI action | ipatool command |
 | --- | --- |
