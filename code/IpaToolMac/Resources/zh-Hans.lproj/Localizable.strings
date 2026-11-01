@@ -81,6 +81,7 @@
 "L_languageEnglish" = "English";
 "L_cancel" = "取消";
 "L_aboutApp" = "关于 IPA Tool";
+"L_checkForUpdates" = "检查更新…";
 "L_quitApp" = "退出 IPA Tool";
 "L_edit" = "编辑";
 "L_undo" = "撤销";

@@ -1,7 +1,13 @@
 import AppKit
+import Sparkle
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var mainWindowController: MainWindowController?
+    private let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
@@ -60,6 +66,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
+    @objc func checkForUpdates(_ sender: Any?) {
+        updaterController.checkForUpdates(sender)
+    }
+
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
+        if menuItem.action == #selector(checkForUpdates(_:)) {
+            return updaterController.updater.canCheckForUpdates
+        }
+        return true
+    }
+
     @objc func selectLanguage(_ sender: NSMenuItem) {
         guard let raw = sender.representedObject as? String, let language = AppLanguage(rawValue: raw) else { return }
         AppLanguage.select(language)
@@ -72,6 +89,7 @@ enum AppMenu {
 
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: L10n.aboutApp, action: #selector(NSApplication.orderFrontStandardAboutPanel(_:)), keyEquivalent: "")
+        appMenu.addItem(withTitle: L10n.checkForUpdates, action: #selector(AppDelegate.checkForUpdates(_:)), keyEquivalent: "")
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: L10n.quitApp, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         let appItem = NSMenuItem()

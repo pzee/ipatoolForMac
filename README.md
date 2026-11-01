@@ -57,6 +57,10 @@ xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
 
 Then open **IPA Tool** from Applications.
 
+### Updates
+
+Starting with 1.0.4, IPA Tool checks GitHub Releases for new versions once a day and installs them in place (powered by [Sparkle](https://sparkle-project.org)). You can also choose **IPA Tool → Check for Updates…**. Versions 1.0.3 and earlier don't include the updater, so install 1.0.4 manually once.
+
 ## Usage
 
 1. Launch **IPA Tool**.

@@ -40,6 +40,7 @@
 		8C450A219F672ADB16733943 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = C3CE89A744425FFD524ED162 /* SnapKit */; };
 		9751563BF59253B33154FE4F /* LocalizationConstant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D0DDA57910E49E414B7A83 /* LocalizationConstant.swift */; };
 		9B29AA1C34D4DD747CAC0005 /* PurchasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB9657F992A180DB9B00DEF /* PurchasesViewController.swift */; };
+		9C5F63B4BDFBAF9E7D644D51 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 42105656849D7860FE4FE587 /* Sparkle */; };
 		A3FBDE8F311C253BC40C3A29 /* DownloadStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDFA0E79F03E7F3B748FBF01 /* DownloadStore.swift */; };
 		AB80C12E6895FE86E5211FC7 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A79ED2706D54CB79C79179 /* Session.swift */; };
 		B93F3C0C4BB3352569B9113B /* FMDB in Frameworks */ = {isa = PBXBuildFile; productRef = 54F9DAC4E3D3BF2A3B79132C /* FMDB */; };
@@ -83,6 +84,7 @@
 		A4BC8E29D264D1BF7EFB4614 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		B8813FF27EAF5E1761294855 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C1F48257673500461116E997 /* IPA Tool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IPA Tool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C206120A74A4C25FF9BBCD2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CDFA0E79F03E7F3B748FBF01 /* DownloadStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadStore.swift; sourceTree = "<group>"; };
 		D04E585497C5D67BE4120474 /* IPAToolService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPAToolService.swift; sourceTree = "<group>"; };
 		E047F01BFF7C39804BBD1954 /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			files = (
 				1418A82FFB10A422BE673692 /* SnapKit in Frameworks */,
 				DD51D97B402F5AD6FC3BCA2C /* FMDB in Frameworks */,
+				9C5F63B4BDFBAF9E7D644D51 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				B8813FF27EAF5E1761294855 /* Assets.xcassets */,
+				C206120A74A4C25FF9BBCD2F /* Info.plist */,
 				2C2CE7BD7DF3D7E991A140E2 /* Resources */,
 				88B50E7342C17DA0D726EB1C /* Sources */,
 			);
@@ -270,6 +274,7 @@
 			packageProductDependencies = (
 				A18413B22EC56F8CAE995FF4 /* SnapKit */,
 				FB03519E1172E3597C4E4606 /* FMDB */,
+				42105656849D7860FE4FE587 /* Sparkle */,
 			);
 			productName = IpaToolMac;
 			productReference = C1F48257673500461116E997 /* IPA Tool.app */;
@@ -307,6 +312,7 @@
 			packageReferences = (
 				D9A2CAAC228D48E5DDD3636B /* XCRemoteSwiftPackageReference "fmdb" */,
 				4655DC0D538A7CF08E3B8EDB /* XCRemoteSwiftPackageReference "SnapKit" */,
+				5F65EFE1F62425E3D29B2229 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 314E5D20B9EE5D6126D89124 /* Products */;
@@ -408,8 +414,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IpaToolMac/Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
 				INFOPLIST_KEY_CFBundleName = "IPA Tool";
@@ -420,7 +427,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;
@@ -448,8 +455,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IpaToolMac/Info.plist;
 				INFOPLIST_KEY_CFBundleDevelopmentRegion = "zh-Hans";
 				INFOPLIST_KEY_CFBundleDisplayName = "IPA Tool";
 				INFOPLIST_KEY_CFBundleName = "IPA Tool";
@@ -460,7 +468,7 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.ipatool.mac;
 				PRODUCT_NAME = "IPA Tool";
 				SDKROOT = macosx;
@@ -655,6 +663,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		5F65EFE1F62425E3D29B2229 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.1;
+			};
+		};
 		D9A2CAAC228D48E5DDD3636B /* XCRemoteSwiftPackageReference "fmdb" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ccgus/fmdb";
@@ -666,6 +682,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		42105656849D7860FE4FE587 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5F65EFE1F62425E3D29B2229 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		54F9DAC4E3D3BF2A3B79132C /* FMDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D9A2CAAC228D48E5DDD3636B /* XCRemoteSwiftPackageReference "fmdb" */;

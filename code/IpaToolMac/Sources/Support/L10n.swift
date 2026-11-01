@@ -84,6 +84,7 @@ enum L10n {
     static var languageEnglish: String { kL_languageEnglish.localized() }
     static var cancel: String { kL_cancel.localized() }
     static var aboutApp: String { kL_aboutApp.localized() }
+    static var checkForUpdates: String { kL_checkForUpdates.localized() }
     static var quitApp: String { kL_quitApp.localized() }
     static var edit: String { kL_edit.localized() }
     static var undo: String { kL_undo.localized() }

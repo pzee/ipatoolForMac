@@ -81,6 +81,7 @@
 "L_languageEnglish" = "English";
 "L_cancel" = "Cancel";
 "L_aboutApp" = "About IPA Tool";
+"L_checkForUpdates" = "Check for Updates…";
 "L_quitApp" = "Quit IPA Tool";
 "L_edit" = "Edit";
 "L_undo" = "Undo";

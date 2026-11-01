@@ -57,6 +57,10 @@ xattr -rd com.apple.quarantine /Applications/IPA\ Tool.app/
 
 然后再从「应用程序」里打开 **IPA Tool**。
 
+### 更新
+
+从 1.0.4 起，IPA Tool 每天会到 GitHub Releases 检查一次新版本，并在应用内完成更新（基于 [Sparkle](https://sparkle-project.org)）。也可以手动选择菜单「IPA Tool → 检查更新…」。1.0.3 及更早的版本没有更新功能，需要先手动安装一次 1.0.4。
+
 ## 使用方法
 
 1. 打开 **IPA Tool**。
